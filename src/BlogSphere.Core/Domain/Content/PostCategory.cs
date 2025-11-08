@@ -6,7 +6,7 @@ namespace BlogSphere.Core.Domain.Content
 {
     [Table("PostCategories")]
     [Index(nameof(Slug), IsUnique = true)]
-    internal class PostCategory
+    public class PostCategory
     {
         [Key]
         public Guid Id { get; set; }
