@@ -1,5 +1,6 @@
 using BlogSphere.Api;
 using BlogSphere.Core.Domain.Identity;
+using BlogSphere.Core.Models.Content;
 using BlogSphere.Core.SeedWorks;
 using BlogSphere.Data;
 using BlogSphere.Data.Repositories;
@@ -56,6 +57,8 @@ foreach (var service in services)
         builder.Services.Add(new ServiceDescriptor(directInterface, service, ServiceLifetime.Scoped));
     }
 }
+
+builder.Services.AddAutoMapper(typeof(PostInListDto));
 
 // Default config for ASP.NET Core
 builder.Services.AddControllers();
