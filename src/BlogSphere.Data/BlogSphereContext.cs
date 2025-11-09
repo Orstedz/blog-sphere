@@ -37,7 +37,7 @@ namespace BlogSphere.Data
         {
             var entries = ChangeTracker
                .Entries()
-               .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+               .Where(e => e.State == EntityState.Added);
 
             foreach (var entityEntry in entries)
             {
