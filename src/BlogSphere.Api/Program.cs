@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BlogSphere.Data;
 using BlogSphere.Api;
+using BlogSphere.Core.SeedWorks;
+using BlogSphere.Data.SeedWorks;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-// Add services to the container.
-
-//Config DB Context and ASP.NET Core Identity
+// Config DB Context and ASP.NET Core Identity
 builder.Services.AddDbContext<BlogSphereContext>(options =>
                 options.UseSqlServer(connectionString));
 
@@ -38,7 +38,11 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.RequireUniqueEmail = false;
 });
 
-//Default config for ASP.NET Core
+// Add services to the container.
+builder.Services.AddScoped(typeof(IRepository<,>), typeof(RepositoryBase<,>));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Default config for ASP.NET Core
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -59,7 +63,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-//Seeding data
+// Seeding data
 app.MigrateDatabase();
 
 app.Run();
