@@ -58,14 +58,14 @@ namespace BlogSphere.Api.Controllers.AdminApi
             var permissions = await this.GetPermissionsByUserIdAsync(user.Id.ToString());
             var claims = new[]
             {
-                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                    new Claim(UserClaims.Id, user.Id.ToString()),
-                    new Claim(ClaimTypes.NameIdentifier, user.UserName),
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(UserClaims.FirstName, user.FirstName),
-                    new Claim(UserClaims.Roles, string.Join(";", roles)),
-                    new Claim(UserClaims.Permissions, JsonSerializer.Serialize(permissions)),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(UserClaims.Id, user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.UserName),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(UserClaims.FirstName, user.FirstName),
+                new Claim(UserClaims.Roles, string.Join(";", roles)),
+                new Claim(UserClaims.Permissions, JsonSerializer.Serialize(permissions)),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
             var accessToken = _tokenService.GenerateAccessToken(claims);
             var refreshToken = _tokenService.GenerateRefreshToken();
