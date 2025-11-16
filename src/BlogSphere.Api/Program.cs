@@ -1,14 +1,18 @@
-using BlogSphere.Api;
-using BlogSphere.Core.Domain.Identity;
-using BlogSphere.Core.Models.Content;
-using BlogSphere.Core.SeedWorks;
-using BlogSphere.Data;
-using BlogSphere.Data.Repositories;
-using BlogSphere.Data.SeedWorks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
+using BlogSphere.Api;
+using BlogSphere.Api.Filters;
+using BlogSphere.Api.Services;
+using BlogSphere.Core.ConfigOptions;
+using BlogSphere.Core.Domain.Identity;
+using BlogSphere.Core.Models.Content;
+using BlogSphere.Core.Repositories;
+using BlogSphere.Core.SeedWorks;
+using BlogSphere.Data;
+using BlogSphere.Data.Repositories;
+using BlogSphere.Data.SeedWorks;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -34,7 +38,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     // Lockout settings.
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
     options.Lockout.MaxFailedAccessAttempts = 5;
-    options.Lockout.AllowedForNewUsers = false;
+    options.Lockout.AllowedForNewUsers = true;
 
     // User settings.
     options.User.AllowedUserNameCharacters =
@@ -45,6 +49,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 // Add services to the container.
 builder.Services.AddScoped(typeof(IRepository<,>), typeof(RepositoryBase<,>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 // Business services and repositories
 var services = typeof(PostRepository).Assembly.GetTypes()
     .Where(x => x.GetInterfaces().Any(i => i.Name == typeof(IRepository<,>).Name)
@@ -60,9 +65,17 @@ foreach (var service in services)
     }
 }
 
+//Auto mapper
 builder.Services.AddAutoMapper(typeof(PostInListDto));
 
-// Default config for ASP.NET Core
+//Authen and author
+builder.Services.Configure<JwtTokenSettings>(configuration.GetSection("JwtTokenSettings"));
+builder.Services.AddScoped<SignInManager<AppUser>, SignInManager<AppUser>>();
+builder.Services.AddScoped<UserManager<AppUser>, UserManager<AppUser>>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<RoleManager<AppRole>, RoleManager<AppRole>>();
+
+//Default config for ASP.NET Core
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -101,7 +114,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Seeding data
+//Seeding data
 app.MigrateDatabase();
 
 app.Run();
